@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>个人博客 - 动态数据交互</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "微软雅黑", sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container {
+      width: 800px;
+      margin: 30px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+    }
+    .header {
+      text-align: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+      margin-bottom: 20px;
+    }
+    .header h2 { color: #2c3e50; }
+    .header p { color: #7f8c8d; font-size: 14px; margin-top: 5px; }
+
+    /* 搜索区域 */
+    .search-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+    .search-bar input, .search-bar select {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      flex: 1;
+    }
+    .search-bar button {
+      padding: 8px 20px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .search-bar button:hover { background: #2980b9; }
+
+    /* 文章列表 */
+    .article-card {
+      padding: 15px;
+      border-bottom: 1px dashed #eee;
+      margin-bottom: 10px;
+    }
+    .article-meta {
+      color: #999;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .article-card h3 {
+      color: #2c3e50;
+      margin-bottom: 6px;
+    }
+    .article-card p {
+      color: #666;
+      font-size: 14px;
+    }
+    .empty-tip {
+      text-align: center;
+      color: #999;
+      padding: 30px;
+    }
+
+    /* 留言区域 */
+    .message-section {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 2px solid #ecf0f1;
+    }
+    .message-section h3 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+    .message-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .message-form input, .message-form textarea {
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    .message-form textarea { resize: vertical; min-height: 80px; }
+    .message-form button {
+      align-self: flex-start;
+      padding: 8px 20px;
+      background: #27ae60;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .message-form button:hover { background: #229954; }
+
+    #message-list {
+      list-style: none;
+    }
+    .message-item {
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .message-user {
+      font-weight: bold;
+      color: #3498db;
+      margin-bottom: 5px;
+    }
+    .message-content {
+      color: #555;
+      font-size: 14px;
+    }
+    .del-btn {
+      background: #e74c3c;
+      color: #fff;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 3px;
+      font-size: 12px;
+      cursor: pointer;
+    }
+
+    /* 定时器拓展 - 公告轮播 */
+    .notice-bar {
+      background: #fff3cd;
+      color: #856404;
+      padding: 8px;
+      text-align: center;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- 定时器拓展：轮播公告 -->
+    <div class="notice-bar" id="noticeBar">欢迎来到我的个人博客~</div>
+
+    <div class="header">
+      <h2>记录学习，也记录生活</h2>
+      <p>Learning Journal · 个人博客</p>
+    </div>
+
+    <!-- 搜索与分类区域 -->
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="输入关键词搜索文章标题...">
+      <select id="categorySelect">
+        <option value="">全部分类</option>
+        <option value="生活随笔">生活随笔</option>
+        <option value="前端基础">前端基础</option>
+      </select>
+      <button id="searchBtn">搜索</button>
+    </div>
+
+    <!-- 文章列表容器 -->
+    <div id="article-list"></div>
+
+    <!-- 留言区域 -->
+    <div class="message-section">
+      <h3>留言列表</h3>
+      <form class="message-form" id="messageForm">
+        <input type="text" id="userName" placeholder="你的昵称" required>
+        <textarea id="userMessage" placeholder="写下你的留言..." required></textarea>
+        <button type="submit">提交留言</button>
+      </form>
+      <ul id="message-list" class="message-list"></ul>
+    </div>
+  </div>
+
+  <!-- 引入数据文件和逻辑文件 -->
+  <script src="js/blog-data.js"></script>
+  <script src="js/blog-stage1.js"></script>
+</body>
+</html>

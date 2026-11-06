@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>实验3 - 换肤功能</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: "微软雅黑", sans-serif;
+      line-height: 1.6;
+      transition: background 0.3s, color 0.3s;
+    }
+    /* 默认皮肤 - 蓝色 */
+    body.skin-blue {
+      background: #f0f6ff;
+      color: #333;
+    }
+    body.skin-blue .header {
+      background: linear-gradient(135deg, #4a90d9, #357abd);
+      color: #fff;
+    }
+    body.skin-blue .content {
+      background: #fff;
+      border-left: 4px solid #4a90d9;
+    }
+    body.skin-blue .skin-item input:checked + .skin-label {
+      border-color: #4a90d9;
+      box-shadow: 0 0 8px rgba(74, 144, 217, 0.3);
+    }
+
+    /* 粉色皮肤 */
+    body.skin-pink {
+      background: #fff0f5;
+      color: #555;
+    }
+    body.skin-pink .header {
+      background: linear-gradient(135deg, #ff6b9d, #ee5a8a);
+      color: #fff;
+    }
+    body.skin-pink .content {
+      background: #fff;
+      border-left: 4px solid #ff6b9d;
+    }
+    body.skin-pink .skin-item input:checked + .skin-label {
+      border-color: #ff6b9d;
+      box-shadow: 0 0 8px rgba(255, 107, 157, 0.3);
+    }
+
+    /* 绿色皮肤 */
+    body.skin-green {
+      background: #f0fff4;
+      color: #333;
+    }
+    body.skin-green .header {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: #fff;
+    }
+    body.skin-green .content {
+      background: #fff;
+      border-left: 4px solid #2ecc71;
+    }
+    body.skin-green .skin-item input:checked + .skin-label {
+      border-color: #2ecc71;
+      box-shadow: 0 0 8px rgba(46, 204, 113, 0.3);
+    }
+
+    /* 暗色皮肤 */
+    body.skin-dark {
+      background: #2c3e50;
+      color: #ecf0f1;
+    }
+    body.skin-dark .header {
+      background: linear-gradient(135deg, #1a252f, #34495e);
+      color: #ecf0f1;
+    }
+    body.skin-dark .content {
+      background: #34495e;
+      border-left: 4px solid #f39c12;
+    }
+    body.skin-dark .content p { color: #bdc3c7; }
+    body.skin-dark .skin-item input:checked + .skin-label {
+      border-color: #f39c12;
+      box-shadow: 0 0 8px rgba(243, 156, 18, 0.3);
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+    .header {
+      padding: 40px;
+      text-align: center;
+      border-radius: 8px 8px 0 0;
+    }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .header p { opacity: 0.9; }
+
+    .skin-selector {
+      background: #fff;
+      padding: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .skin-selector h3 {
+      margin-bottom: 15px;
+      font-size: 16px;
+      color: inherit;
+    }
+    .skin-list {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+    .skin-item {
+      cursor: pointer;
+    }
+    .skin-item input {
+      display: none;
+    }
+    .skin-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 15px;
+      border: 2px solid #ddd;
+      border-radius: 8px;
+      transition: all 0.3s;
+      cursor: pointer;
+    }
+    .skin-label:hover {
+      border-color: #999;
+    }
+    .skin-preview {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-bottom: 8px;
+    }
+    .preview-blue { background: linear-gradient(135deg, #4a90d9, #357abd); }
+    .preview-pink { background: linear-gradient(135deg, #ff6b9d, #ee5a8a); }
+    .preview-green { background: linear-gradient(135deg, #2ecc71, #27ae60); }
+    .preview-dark { background: linear-gradient(135deg, #2c3e50, #1a252f); }
+    .skin-name {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .content {
+      padding: 30px;
+      border-radius: 0 0 8px 8px;
+    }
+    .content h2 {
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+    .content p {
+      margin-bottom: 10px;
+      text-indent: 2em;
+    }
+  </style>
+</head>
+<body class="skin-blue">
+  <div class="container">
+    <div class="header">
+      <h1>欢迎来到我的网页</h1>
+      <p>点击下方皮肤选项，试试换肤效果吧~</p>
+    </div>
+
+    <div class="skin-selector">
+      <h3>选择皮肤主题：</h3>
+      <div class="skin-list">
+        <label class="skin-item">
+          <input type="radio" name="skin" value="skin-blue" checked>
+          <span class="skin-label">
+            <span class="skin-preview preview-blue"></span>
+            <span class="skin-name">经典蓝</span>
+          </span>
+        </label>
+        <label class="skin-item">
+          <input type="radio" name="skin" value="skin-pink">
+          <span class="skin-label">
+            <span class="skin-preview preview-pink"></span>
+            <span class="skin-name">少女粉</span>
+          </span>
+        </label>
+        <label class="skin-item">
+          <input type="radio" name="skin" value="skin-green">
+          <span class="skin-label">
+            <span class="skin-preview preview-green"></span>
+            <span class="skin-name">清新绿</span>
+          </span>
+        </label>
+        <label class="skin-item">
+          <input type="radio" name="skin" value="skin-dark">
+          <span class="skin-label">
+            <span class="skin-preview preview-dark"></span>
+            <span class="skin-name">暗夜黑</span>
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="content">
+      <h2>换肤功能说明</h2>
+      <p>这是一个基于JavaScript鼠标事件实现的换肤功能示例。用户点击不同的皮肤选项时，通过修改body元素的class属性来切换整体页面样式。</p>
+      <p>实现原理：预先定义多套CSS类样式，当用户选择某套皮肤时，通过JS动态修改body的className，从而达到切换主题的效果。所有样式切换都有平滑的过渡动画。</p>
+      <p>你可以点击上方的不同皮肤选项，观察整个页面的背景色、标题栏、内容区域的样式变化。</p>
+    </div>
+  </div>
+
+  <script>
+    // 换肤功能 - 绑定鼠标点击事件
+    const skinRadios = document.querySelectorAll('input[name="skin"]');
+    
+    skinRadios.forEach(radio => {
+      radio.addEventListener('click', function() {
+        // 移除所有皮肤类
+        document.body.classList.remove('skin-blue', 'skin-pink', 'skin-green', 'skin-dark');
+        // 添加选中的皮肤类
+        document.body.classList.add(this.value);
+        // 保存到本地存储
+        localStorage.setItem('selectedSkin', this.value);
+      });
+    });
+
+    // 页面加载时恢复上次选择的皮肤
+    window.onload = function() {
+      const savedSkin = localStorage.getItem('selectedSkin');
+      if (savedSkin) {
+        document.body.classList.remove('skin-blue', 'skin-pink', 'skin-green', 'skin-dark');
+        document.body.classList.add(savedSkin);
+        // 同步单选按钮状态
+        document.querySelector(`input[name="skin"][value="${savedSkin}"]`).checked = true;
+      }
+    };
+  </script>
+</body>
+</html>

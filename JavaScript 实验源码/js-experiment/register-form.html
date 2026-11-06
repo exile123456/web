@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>JS表单验证练习</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background: #f5f5f5; 
+            padding: 50px 0;
+            font-family: "微软雅黑";
+        }
+        .form-box {
+            width: 520px;
+            margin: 0 auto;
+            background: white;
+            padding: 35px;
+            border-radius: 8px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+        h2 { text-align: center; margin-bottom: 30px; }
+        .form-item { margin-bottom: 20px; }
+        .form-item label {
+            display: inline-block;
+            width: 100px;
+            text-align: right;
+            margin-right: 10px;
+            color: #666;
+        }
+        .form-item input {
+            width: 280px;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            outline: none;
+        }
+        .form-item input:focus { border-color: #409eff; }
+        .tip {
+            display: block;
+            margin: 5px 0 0 115px;
+            font-size: 12px;
+            color: #999;
+        }
+        .tip.error { color: #f56c6c; }
+        .tip.success { color: #67c23a; }
+        .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background: #409eff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-box">
+        <h2>用户注册</h2>
+        <form id="registerForm">
+            <div class="form-item">
+                <label>用户名：</label>
+                <input type="text" id="username" placeholder="4-12位字母数字下划线">
+                <span class="tip" id="userTip">由4-12位字母、数字、下划线组成</span>
+            </div>
+            <div class="form-item">
+                <label>邮箱：</label>
+                <input type="text" id="email" placeholder="请输入邮箱">
+                <span class="tip" id="emailTip">请输入有效的邮箱地址</span>
+            </div>
+            <div class="form-item">
+                <label>手机号：</label>
+                <input type="text" id="phone" placeholder="11位手机号">
+                <span class="tip" id="phoneTip">请输入11位中国大陆手机号</span>
+            </div>
+            <div class="form-item">
+                <label>密码：</label>
+                <input type="password" id="pwd" placeholder="6-16位字母+数字">
+                <span class="tip" id="pwdTip">密码6-16位，需包含字母和数字</span>
+            </div>
+            <div class="form-item">
+                <label>确认密码：</label>
+                <input type="password" id="repwd" placeholder="再次输入密码">
+                <span class="tip" id="repwdTip">两次输入密码必须一致</span>
+            </div>
+            <button type="submit" class="submit-btn">立即注册</button>
+        </form>
+    </div>
+
+    <script>
+        // ========== 1. 正则表达式定义 ==========
+        const regUser = /^\w{4,12}$/;          // 用户名
+        const regEmail = /^\w+([-+.]\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/; // 邮箱
+        const regPhone = /^1[3-9]\d{9}$/;      // 手机号
+        const regPwd = /^(?=.*[a-zA-Z])(?=.*\d)[a-zA-Z\d]{6,16}$/; // 密码
+
+        // ========== 2. 获取DOM元素 ==========
+        const form = document.getElementById('registerForm');
+        const username = document.getElementById('username');
+        const email = document.getElementById('email');
+        const phone = document.getElementById('phone');
+        const pwd = document.getElementById('pwd');
+        const repwd = document.getElementById('repwd');
+
+        const userTip = document.getElementById('userTip');
+        const emailTip = document.getElementById('emailTip');
+        const phoneTip = document.getElementById('phoneTip');
+        const pwdTip = document.getElementById('pwdTip');
+        const repwdTip = document.getElementById('repwdTip');
+
+        // ========== 3. 通用提示函数 ==========
+        function showError(el, msg) { el.className = 'tip error'; el.textContent = msg; }
+        function showSuccess(el, msg) { el.className = 'tip success'; el.textContent = msg; }
+        function showDefault(el, msg) { el.className = 'tip'; el.textContent = msg; }
+
+        // ========== 4. 单个字段验证函数 ==========
+        function checkUser() {
+            let val = username.value.trim();
+            if(!val) { showError(userTip, '用户名不能为空'); return false; }
+            if(!regUser.test(val)) { showError(userTip, '格式错误，需4-12位字母数字下划线'); return false; }
+            showSuccess(userTip, '格式正确');
+            return true;
+        }
+        function checkEmail() {
+            let val = email.value.trim();
+            if(!val) { showError(emailTip, '邮箱不能为空'); return false; }
+            if(!regEmail.test(val)) { showError(emailTip, '邮箱格式不正确'); return false; }
+            showSuccess(emailTip, '格式正确');
+            return true;
+        }
+        function checkPhone() {
+            let val = phone.value.trim();
+            if(!val) { showError(phoneTip, '手机号不能为空'); return false; }
+            if(!regPhone.test(val)) { showError(phoneTip, '请输入11位有效手机号'); return false; }
+            showSuccess(phoneTip, '格式正确');
+            return true;
+        }
+        function checkPwd() {
+            let val = pwd.value;
+            if(!val) { showError(pwdTip, '密码不能为空'); return false; }
+            if(!regPwd.test(val)) { showError(pwdTip, '密码需6-16位，包含字母和数字'); return false; }
+            showSuccess(pwdTip, '格式正确');
+            if(repwd.value) checkRepwd(); // 密码修改后重新校验确认密码
+            return true;
+        }
+        function checkRepwd() {
+            let val = repwd.value;
+            if(!val) { showError(repwdTip, '请再次输入密码'); return false; }
+            if(val !== pwd.value) { showError(repwdTip, '两次密码不一致'); return false; }
+            showSuccess(repwdTip, '两次密码一致');
+            return true;
+        }
+
+        // ========== 5. 绑定 focus / blur 事件 ==========
+        username.addEventListener('focus', () => showDefault(userTip, '由4-12位字母、数字、下划线组成'));
+        username.addEventListener('blur', checkUser);
+
+        email.addEventListener('focus', () => showDefault(emailTip, '请输入有效的邮箱地址'));
+        email.addEventListener('blur', checkEmail);
+
+        phone.addEventListener('focus', () => showDefault(phoneTip, '请输入11位中国大陆手机号'));
+        phone.addEventListener('blur', checkPhone);
+
+        pwd.addEventListener('focus', () => showDefault(pwdTip, '密码6-16位，需包含字母和数字'));
+        pwd.addEventListener('blur', checkPwd);
+
+        repwd.addEventListener('focus', () => showDefault(repwdTip, '两次输入密码必须一致'));
+        repwd.addEventListener('blur', checkRepwd);
+
+        // ========== 6. 表单 submit 提交验证 ==========
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // 阻止表单默认跳转提交
+
+            // 执行所有验证
+            const res1 = checkUser();
+            const res2 = checkEmail();
+            const res3 = checkPhone();
+            const res4 = checkPwd();
+            const res5 = checkRepwd();
+
+            if(res1 && res2 && res3 && res4 && res5) {
+                // 收集表单数据
+                const data = {
+                    username: username.value.trim(),
+                    email: email.value.trim(),
+                    phone: phone.value.trim(),
+                    password: pwd.value
+                };
+                console.log("=== 表单验证通过，提交数据 ===");
+                console.log(data);
+                alert('注册成功！详细数据已输出到浏览器控制台');
+            } else {
+                console.log("表单验证未通过，请检查输入项");
+            }
+        });
+    </script>
+</body>
+</html>

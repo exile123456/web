@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>JS基础语法与三种引入方式</title>
+    <!-- 第一种：JS写在head中，必须配合window.onload等待DOM渲染完成 -->
+    <script>
+        // window.onload：页面所有DOM、资源加载完成后才执行内部代码
+        window.onload = function() {
+            console.log("=== 1. head内JS（window.onload方式）执行 ===");
+            const btn = document.getElementById('showBtn');
+            btn.onclick = function() {
+                console.log('点击按钮触发：head中JS执行成功');
+            }
+
+            // ---------- 基础语法练习 ----------
+            console.log("\n=== JS基础语法演示 ===");
+            // 变量与常量
+            let num = 100;
+            const SITE_NAME = "JavaScript实验";
+            console.log("变量num:", num, "常量:", SITE_NAME);
+
+            // 数据类型
+            let str = "字符串类型";
+            let bool = true;
+            let arr = [10, 20, 30, 40];
+            let obj = {name: "张三", score: 88};
+            console.log("字符串:", str, "布尔:", bool);
+            console.log("数组:", arr, "对象:", obj);
+
+            // 条件语句
+            let score = 78;
+            if(score >= 90) console.log("成绩：优秀");
+            else if(score >= 60) console.log("成绩：及格");
+            else console.log("成绩：不及格");
+
+            // 循环语句
+            console.log("for循环输出1-5：");
+            for(let i=1; i<=5; i++) {
+                console.log(i);
+            }
+
+            // 普通函数
+            function add(a, b) {
+                return a + b;
+            }
+            console.log("函数调用 add(5,8):", add(5,8));
+        }
+    </script>
+</head>
+<body>
+    <h2>JS基础语法练习页面</h2>
+    <button id="showBtn">点击查看控制台输出</button>
+    <hr>
+    <h3>ES6语法演示</h3>
+    <button id="es6Btn">执行ES6代码</button>
+
+    <!-- 第二种：JS写在body底部，DOM已加载完成，无需window.onload -->
+    <script>
+        console.log("\n=== 2. body底部JS（无需onload）执行 ===");
+        const es6Btn = document.getElementById('es6Btn');
+        
+        es6Btn.onclick = function() {
+            console.log("\n=== ES6常用语法演示 ===");
+            
+            // 1. 块级作用域 let/const
+            {
+                let blockVar = "块级变量，外部不可访问";
+                const BLOCK_CONST = "块级常量";
+                console.log(blockVar, BLOCK_CONST);
+            }
+
+            // 2. 箭头函数
+            const sum = (a, b) => a + b;
+            console.log("箭头函数 sum(3,7):", sum(3,7));
+
+            // 3. 模板字符串
+            let name = "小明";
+            let age = 21;
+            let info = `姓名：${name}，年龄：${age}岁`;
+            console.log("模板字符串:", info);
+
+            // 4. 解构赋值
+            let [x, y] = [100, 200];
+            let {name: uName, age: uAge} = {name: "小红", age: 22};
+            console.log("数组解构:", x, y, "对象解构:", uName, uAge);
+
+            // 5. 数组高阶方法 map/filter
+            let nums = [1,2,3,4,5];
+            let double = nums.map(item => item * 2);
+            let bigNum = nums.filter(item => item > 3);
+            console.log("map结果:", double, "filter结果:", bigNum);
+        }
+    </script>
+
+    <!-- 第三种：引入外部独立JS文件，推荐放在body末尾 -->
+    <script src="js/ex01.js"></script>
+</body>
+</html>

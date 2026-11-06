@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>JS事件练习：学生成绩统计</title>
+    <style>
+        .container { width: 650px; margin: 30px auto; font-family: "微软雅黑"; }
+        .pass-line { margin: 15px 0; }
+        .pass-line input { width: 60px; padding: 4px; }
+        button { padding: 6px 15px; cursor: pointer; margin-left: 10px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        tbody tr:hover { background: #e8f4ff; cursor: pointer; }
+        .result { padding: 15px; background: #f5f5f5; border-radius: 5px; line-height: 2; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>学生成绩统计</h2>
+        <div class="pass-line">
+            及格线设置：
+            <input type="number" id="passLine" value="60"> 分
+            <button id="calcBtn">统计成绩</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr><th>序号</th><th>姓名</th><th>成绩</th></tr>
+            </thead>
+            <tbody id="scoreBody">
+                <tr><td>1</td><td>张三</td><td>85</td></tr>
+                <tr><td>2</td><td>李四</td><td>58</td></tr>
+                <tr><td>3</td><td>王五</td><td>92</td></tr>
+                <tr><td>4</td><td>赵六</td><td>76</td></tr>
+                <tr><td>5</td><td>孙七</td><td>45</td></tr>
+                <tr><td>6</td><td>周八</td><td>88</td></tr>
+            </tbody>
+        </table>
+
+        <div class="result">
+            <h3>统计结果</h3>
+            <p>总人数：<span id="totalNum">0</span> 人</p>
+            <p>及格人数：<span id="passNum">0</span> 人</p>
+            <p>不及格人数：<span id="failNum">0</span> 人</p>
+            <p>平均分：<span id="avgScore">0</span> 分</p>
+        </div>
+    </div>
+
+    <script>
+        // DOM元素查找：三种常用获取方式
+        const calcBtn = document.getElementById('calcBtn'); // 通过ID获取
+        const scoreBody = document.getElementById('scoreBody');
+        const passLineInput = document.querySelector('#passLine'); // 选择器获取单个
+        const rows = document.querySelectorAll('#scoreBody tr'); // 选择器获取多个
+
+        // 点击事件：点击按钮统计成绩
+        calcBtn.onclick = calculateScore;
+
+        // 鼠标事件：课后选做 - 悬停行显示学生信息
+        rows.forEach(row => {
+            row.addEventListener('mouseenter', function() {
+                const name = this.children[1].textContent;
+                const score = this.children[2].textContent;
+                console.log(`鼠标悬停：学生${name}，成绩${score}分`);
+            });
+        });
+
+        // 统计核心函数
+        function calculateScore() {
+            const passLine = parseFloat(passLineInput.value) || 60;
+            let total = rows.length;
+            let passCount = 0;
+            let sum = 0;
+
+            rows.forEach(row => {
+                let score = parseFloat(row.children[2].textContent);
+                sum += score;
+                if(score >= passLine) passCount++;
+            });
+
+            let avg = (sum / total).toFixed(2);
+            // 更新页面显示
+            document.getElementById('totalNum').textContent = total;
+            document.getElementById('passNum').textContent = passCount;
+            document.getElementById('failNum').textContent = total - passCount;
+            document.getElementById('avgScore').textContent = avg;
+
+            // 控制台输出结果
+            console.log("\n=== 成绩统计结果 ===");
+            console.log(`及格线：${passLine}分 | 总人数：${total}人`);
+            console.log(`及格：${passCount}人 | 不及格：${total-passCount}人 | 平均分：${avg}分`);
+        }
+
+        // 页面加载自动执行一次统计
+        window.onload = calculateScore;
+    </script>
+</body>
+</html>
