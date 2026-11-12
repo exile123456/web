@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>1 选项式 API 基础语法 · 实验5</title>
+  <link rel="stylesheet" href="css/common.css">
+  <style>
+    .kv {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 8px 12px;
+      font-size: 13.5px;
+      align-items: center;
+    }
+
+    .kv dt {
+      color: var(--ink-3);
+      font-family: var(--mono);
+      font-size: 12.5px;
+    }
+
+    .kv dd {
+      margin: 0;
+      color: var(--ink);
+    }
+
+    .counter {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .counter .val {
+      min-width: 92px;
+      text-align: center;
+      font: 700 34px/1 var(--mono);
+      color: var(--brand-dark);
+      letter-spacing: -.02em;
+    }
+
+    .beat {
+      flex: none;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid #d7dce5;
+      background: #fff;
+      color: var(--ink-2);
+      font: 700 17px/1 var(--mono);
+      cursor: pointer;
+      transition: .16s;
+    }
+
+    .beat:hover {
+      border-color: var(--brand);
+      color: var(--brand);
+      background: var(--brand-soft);
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 720px) {
+      .two-col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .box {
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 15px 16px;
+      background: #fcfcfe;
+    }
+
+    .box h4 {
+      font-size: 13px;
+      color: var(--ink-3);
+      font-weight: 700;
+      letter-spacing: .03em;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .big-num {
+      font: 700 28px/1.2 var(--mono);
+      color: var(--ink);
+    }
+
+    .hits {
+      font-size: 12.5px;
+      color: var(--ink-3);
+      margin-top: 6px;
+      font-family: var(--mono);
+    }
+
+    .log {
+      max-height: 190px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 12.3px;
+      line-height: 1.85;
+      background: #0f172a;
+      color: #cbd5e1;
+      border-radius: var(--r);
+      padding: 11px 13px;
+      margin: 0;
+      list-style: none;
+    }
+
+    .log li {
+      border-bottom: 1px solid rgba(255, 255, 255, .06);
+      padding: 2px 0;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .log li:last-child {
+      border-bottom: 0;
+    }
+
+    .log .t {
+      color: #64748b;
+      margin-right: 8px;
+    }
+
+    .log .n {
+      color: #7dd3fc;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <span class="brand"><i class="brand-dot"></i>实验5 · Vue.js</span>
+      <nav class="topnav">
+        <a href="index.html">首页</a>
+        <a href="01-basic.html" class="active">1 基础语法</a>
+        <a href="02-directives.html">2 常用指令</a>
+        <a href="03-blog.html">3 博客重构</a>
+        <a href="04-todolist.html">4 Todolist</a>
+        <a href="05-todolist-plus.html">5 增强版</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app" class="wrap" v-cloak>
+
+    <div class="page-head">
+      <span class="eyebrow">实验三 · 2(1) 选项式 API 语法规则</span>
+      <h1>data / methods / computed / watch / mounted</h1>
+      <p class="sub">
+        选项式 API（Options API）把所有能力按"选项"堆在一个对象里，交给
+        <code>createApp()</code> 后由 <code>.mount('#app')</code> 接管 DOM。
+        本页用五个可交互的小例子，逐个确认这五个选项各自负责什么。
+      </p>
+    </div>
+
+    <div class="note" style="margin-bottom:20px">
+      所有交互都在浏览器内存中完成，刷新页面即恢复初始状态；右侧"数据探针"是调试面板，
+      直接打印组件当前的状态值，便于对照验收。
+    </div>
+
+    <!-- ============ 1. data + methods ============ -->
+    <section class="card">
+      <div class="card-hd">
+        <span class="step">1</span>
+        <h2>data 定义状态 · methods 定义动作</h2>
+        <span class="tag tag-brand">插值表达式 {{ }}</span>
+      </div>
+      <div class="card-bd">
+        <p class="hint">
+          <code>data()</code> 必须返回一个<strong>新对象</strong>，Vue 会把它变成响应式数据；
+          <code>methods</code> 里的函数通过 <code>this</code> 读写这些数据，改数据即改视图，不需要碰 DOM。
+        </p>
+
+        <div class="counter">
+          <button class="beat" @click="count--" title="减 1">−</button>
+          <span class="val">{{ count }}</span>
+          <button class="beat" @click="count++" title="加 1">+</button>
+          <button class="btn btn-soft btn-sm" @click="count = 0" style="margin-left:6px">归零</button>
+        </div>
+
+        <div class="probe">
+          <span class="pl"><b>数据探针</b></span>
+          <span class="pl"><span class="k">count</span> = {{ count }}　<span class="k">double</span> = {{ count * 2 }}（模板内表达式）</span>
+          <span class="pl"><span class="k">clicks</span> = {{ clicks }}　<span class="k">最近一次操作</span> = {{ lastAction }}</span>
+        </div>
+
+        <p class="hint">
+          注意 <code v-pre>{{ count * 2 }}</code> 是<strong>写死在模板里的表达式</strong>，每次重新渲染都会重算；
+          而下面的 <code>computed</code> 会把结果缓存起来，只有依赖变了才重新求值。
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 2. computed vs methods ============ -->
+    <section class="card">
+      <div class="card-hd">
+        <span class="step">2</span>
+        <h2>computed 计算属性：带缓存的派生状态</h2>
+        <span class="tag tag-brand">依赖不变 → 不重算</span>
+      </div>
+      <div class="card-bd">
+        <div class="two-col">
+          <div class="field">
+            <label>单价 price（元）</label>
+            <input class="input" type="number" v-model.number="price" min="0">
+          </div>
+          <div class="field">
+            <label>数量 qty</label>
+            <input class="input" type="number" v-model.number="qty" min="1">
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top:14px">
+          <div class="box">
+            <h4>computed · total</h4>
+            <div class="big-num">¥ {{ total }}</div>
+            <div class="hits">getter 实际求值次数：{{ computeCalls }}</div>
+          </div>
+          <div class="box">
+            <h4>methods · getTotal()</h4>
+            <div class="big-num">¥ {{ lastMethodResult }}</div>
+            <div class="hits">方法被调用次数：{{ methodCalls }}</div>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:12px">
+          <button class="btn btn-ghost btn-sm" @click="callMethod">手动调用一次 getTotal()</button>
+          <button class="btn btn-ghost btn-sm" @click="rerenderOnly">只触发重渲染（不动 price/qty）</button>
+          <span class="hint">反复点第二个按钮，<code>computeCalls</code> 不会增长 —— 这就是缓存。</span>
+        </div>
+
+        <div class="note" style="margin-top:14px">
+          <span>
+            为了把缓存"看得见"，本示例在 computed 里用 <code>setTimeout</code> 记录了一次调用次数。
+            这只是教学用的观察手段 —— <strong>真实项目中不要 computed 里做副作用</strong>，
+            computed 应该只负责"由已有状态算出新值"。
+          </span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. watch ============ -->
+    <section class="card">
+      <div class="card-hd">
+        <span class="step">3</span>
+        <h2>watch 侦听器：数据变化时执行副作用</h2>
+        <span class="tag tag-brand">watch / deep</span>
+      </div>
+      <div class="card-bd">
+        <div class="field">
+          <label>输入标题（观察 watch 何时被触发）</label>
+          <input class="input" v-model.trim="title" placeholder="随便改几个字试试…" maxlength="40">
+        </div>
+
+        <div class="probe">
+          <span class="pl"><b>watch 回调收到的新旧值</b></span>
+          <span class="pl"><span class="k">title</span>      当前 = "{{ title }}"</span>
+          <span class="pl"><span class="k">newTitle</span> = "{{ watchState.newVal }}"</span>
+          <span class="pl"><span class="k">oldTitle</span> = "{{ watchState.oldVal }}"</span>
+          <span class="pl"><span class="k">触发次数</span> = {{ watchState.hits }} 次，最近一次 {{ watchState.at || '—' }}</span>
+          <span class="pl"><span class="k">字数</span> = {{ title.length }} 字 {{ title.length > 20 ? '（偏长了）' : '' }}</span>
+        </div>
+
+        <h4 style="font-size:13px;color:var(--ink-3);margin:16px 0 8px;letter-spacing:.03em">对象深层侦听（deep: true）</h4>
+        <div class="two-col">
+          <div class="field">
+            <label>昵称</label>
+            <input class="input" v-model="profile.nickname" maxlength="16">
+          </div>
+          <div class="field">
+            <label>城市</label>
+            <input class="input" v-model="profile.city" maxlength="16">
+          </div>
+        </div>
+        <p class="hint" style="margin-top:8px">
+          <code>watch: { profile: { handler, deep: true } }</code> —— 不开启 deep 时，
+          修改 <code>profile.nickname</code> 不会触发侦听，因为对象引用本身没变。
+          当前已触发 <strong>{{ profileHits }}</strong> 次。
+        </p>
+      </div>
+    </section>
+
+    <!-- ============ 4. 生命周期 ============ -->
+    <section class="card">
+      <div class="card-hd">
+        <span class="step">4</span>
+        <h2>生命周期钩子：mounted 之后才能安全操作 DOM</h2>
+        <span class="tag tag-brand">created → mounted → updated</span>
+      </div>
+      <div class="card-bd">
+        <div class="two-col">
+          <div>
+            <div class="probe">
+              <span class="pl"><b>挂载信息</b></span>
+              <span class="pl"><span class="k">挂载时刻</span> = {{ mountedAt }}</span>
+              <span class="pl"><span class="k">根节点高度</span> = {{ rootHeight }} px</span>
+              <span class="pl"><span class="k">说明</span> = 高度只有在 mounted 之后才读得到真实值</span>
+            </div>
+            <button class="btn btn-ghost btn-sm" style="margin-top:12px" @click="measure">重新测量根节点高度</button>
+            <button class="btn btn-ghost btn-sm" style="margin-top:12px" @click="touchUpdate">触发一次更新（观察 updated）</button>
+          </div>
+          <div>
+            <h4 style="font-size:13px;color:var(--ink-3);margin:0 0 8px;letter-spacing:.03em">钩子执行日志</h4>
+            <ul class="log">
+              <li v-for="(h, i) in hookLog" :key="i"><span class="t">{{ h.time }}</span><span class="n">{{ h.name }}</span> {{ h.msg }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 代码 ============ -->
+    <section class="card">
+      <div class="card-hd">
+        <h2>关键代码</h2>
+        <span class="tag">本页 script 节选</span>
+      </div>
+      <div class="card-bd">
+        <details class="code-fold">
+          <summary>展开查看选项式 API 的完整骨架</summary>
+          <pre class="code" v-pre><code>const { createApp } = Vue
+
+createApp({
+  // ① 状态：必须返回新对象，Vue 会做响应式代理
+  data() {
+    return {
+      count: 0,
+      price: 99,
+      qty: 2,
+      title: '',
+      profile: { nickname: '陈燃', city: '重庆' },
+      computeCalls: 0,
+      methodCalls: 0,
+      hookLog: []
+    }
+  },
+
+  // ② 派生状态：有缓存，只在依赖变化时重新求值
+  computed: {
+    total() {
+      // 调试用：异步登记一次求值，避免在 getter 里同步修改响应式数据
+      setTimeout(() =&gt; { this.computeCalls++ }, 0)
+      return this.price * this.qty
+    }
+  },
+
+  // ③ 动作：由事件触发，每次调用都执行
+  methods: {
+    getTotal() {
+      return this.price * this.qty
+    },
+    callMethod() {
+      this.lastMethodResult = this.getTotal()
+      this.methodCalls++
+    }
+  },
+
+  // ④ 副作用：数据变化后执行（异步批处理，默认不等待 DOM 更新）
+  watch: {
+    title(newVal, oldVal) {
+      this.watchState = { newVal, oldVal, hits: this.watchState.hits + 1, at: new Date().toLocaleTimeString() }
+    },
+    profile: {
+      handler() { this.profileHits++ },
+      deep: true          // 对象内部属性变化也要侦听
+    }
+  },
+
+  // ⑤ 生命周期：此时 DOM 已挂载，可以读取尺寸
+  mounted() {
+    this.mountedAt = new Date().toLocaleTimeString()
+    this.measure()
+  }
+}).mount('#app')</code></pre>
+        </details>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>实验5 · 1 选项式 API 基础语法</span>
+      <span>Vue {{ vueVersion }}</span>
+    </footer>
+  </main>
+
+  <script src="vendor/vue.global.js"></script>
+  <script>
+    const { createApp } = Vue
+
+    createApp({
+      data() {
+        return {
+          vueVersion: Vue.version,
+
+          /* —— 计数器 —— */
+          count: 0,
+          clicks: 0,
+          lastAction: '—',
+
+          /* —— computed 演示 —— */
+          price: 99,
+          qty: 2,
+          computeCalls: 0,
+          methodCalls: 0,
+          lastMethodResult: 198,
+          tick: 0,                 // 仅用于"只触发重渲染"
+
+          /* —— watch 演示 —— */
+          title: 'Vue 响应式原理入门',
+          watchState: { newVal: '', oldVal: '', hits: 0, at: '' },
+          profile: { nickname: '陈燃', city: '重庆' },
+          profileHits: 0,
+
+          /* —— 生命周期 —— */
+          mountedAt: '—',
+          rootHeight: 0,
+          hookLog: []
+        }
+      },
+
+      computed: {
+        total() {
+          // 只在 price / qty 变化时才会真正走进来
+          setTimeout(() => { this.computeCalls++ }, 0)
+          return this.price * this.qty
+        }
+      },
+
+      methods: {
+        getTotal() {
+          return this.price * this.qty
+        },
+        callMethod() {
+          this.lastMethodResult = this.getTotal()
+          this.methodCalls++
+          this.lastAction = 'methods.getTotal()'
+        },
+        rerenderOnly() {
+          this.tick++
+          this.lastAction = '仅修改 tick，触发重渲染'
+        },
+        measure() {
+          // 注意：根组件有多个根节点时 this.$el 可能是注释占位节点，
+          // 取不到尺寸，因此这里直接用 id 拿挂载容器
+          const el = document.getElementById('app')
+          this.rootHeight = el ? Math.round(el.getBoundingClientRect().height) : 0
+        },
+        touchUpdate() {
+          // beforeUpdate 在 DOM 更新前触发；$nextTick 的回调在 DOM 更新后执行，等价于 updated 时机
+          this.count++
+          this.$nextTick(() => {
+            this.writeHook('updated', `DOM 已同步，count = ${this.count}`)
+            this.measure()
+          })
+        },
+        writeHook(name, msg) {
+          this.hookLog.push({ name, msg, time: new Date().toLocaleTimeString('zh-CN', { hour12: false }) })
+          if (this.hookLog.length > 40) this.hookLog.shift()
+        }
+      },
+
+      watch: {
+        count(newVal, oldVal) {
+          this.clicks++
+          this.lastAction = `count: ${oldVal} → ${newVal}`
+        },
+        title(newVal, oldVal) {
+          this.watchState = {
+            newVal,
+            oldVal,
+            hits: this.watchState.hits + 1,
+            at: new Date().toLocaleTimeString('zh-CN', { hour12: false })
+          }
+        },
+        profile: {
+          handler() { this.profileHits++ },
+          deep: true
+        }
+      },
+
+      created() {
+        this.writeHook('created', '状态已初始化，DOM 还不存在')
+      },
+
+      beforeMount() {
+        this.writeHook('beforeMount', '模板即将渲染到页面')
+      },
+
+      mounted() {
+        this.mountedAt = new Date().toLocaleTimeString('zh-CN', { hour12: false })
+        this.writeHook('mounted', 'DOM 挂载完成，可以读取尺寸')
+        this.measure()
+      }
+
+      // 说明：beforeUpdate / updated 里若直接修改 data，会"记录日志 → 触发更新 → 再记录"形成死循环，
+      // 因此本页统一用 $nextTick 在 DOM 更新后记录，效果等价且安全。
+    }).mount('#app')
+  </script>
+</body>
+
+</html>

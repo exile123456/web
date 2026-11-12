@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>实验5 · Vue.js 基本语法和常用指令 · 首页</title>
+  <link rel="stylesheet" href="css/common.css">
+  <style>
+    /* 仅本页使用的样式 */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 20px;
+      padding: 40px 36px;
+      margin-bottom: 22px;
+      background: linear-gradient(135deg, #312e81 0%, #4f46e5 52%, #7c3aed 100%);
+      color: #fff;
+      box-shadow: 0 16px 40px rgba(49, 46, 129, .28);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      right: -70px;
+      top: -70px;
+      width: 280px;
+      height: 280px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 255, 255, .22), transparent 68%);
+      pointer-events: none;
+    }
+
+    .hero .kicker {
+      display: inline-block;
+      padding: 3px 11px;
+      border-radius: 99px;
+      background: rgba(255, 255, 255, .16);
+      border: 1px solid rgba(255, 255, 255, .28);
+      font-size: 12.5px;
+      letter-spacing: .05em;
+    }
+
+    .hero h1 {
+      font-size: 32px;
+      margin: 14px 0 10px;
+    }
+
+    .hero p {
+      color: #e0e7ff;
+      font-size: 14.5px;
+      max-width: 620px;
+    }
+
+    .hero .meta {
+      margin-top: 18px;
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #c7d2fe;
+    }
+
+    .hero .meta b {
+      color: #fff;
+      font-size: 15px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .demo-card {
+      display: block;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: #fff;
+      color: inherit;
+      transition: .18s;
+      position: relative;
+    }
+
+    .demo-card:hover {
+      border-color: var(--brand-line);
+      box-shadow: 0 10px 26px rgba(79, 70, 229, .13);
+      transform: translateY(-2px);
+    }
+
+    .demo-card .no {
+      font-family: var(--mono);
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--brand);
+      letter-spacing: .06em;
+    }
+
+    .demo-card h3 {
+      font-size: 15.5px;
+      margin: 7px 0 6px;
+    }
+
+    .demo-card p {
+      font-size: 13px;
+      color: var(--ink-3);
+      line-height: 1.65;
+      margin-bottom: 10px;
+    }
+
+    .demo-card .go {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--brand);
+    }
+
+    table.tbl {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+
+    table.tbl th,
+    table.tbl td {
+      text-align: left;
+      padding: 9px 10px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    table.tbl th {
+      background: #f8fafc;
+      color: var(--ink-2);
+      font-size: 12.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    table.tbl tr:last-child td {
+      border-bottom: 0;
+    }
+
+    table.tbl code {
+      white-space: nowrap;
+    }
+
+    .check-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 8px 2px;
+      border-bottom: 1px dashed #e8ecf3;
+      font-size: 13.5px;
+    }
+
+    .check-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .check-list input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 4px;
+      accent-color: var(--brand);
+      flex: none;
+      cursor: pointer;
+    }
+
+    .check-list .txt.done {
+      color: var(--ink-4);
+      text-decoration: line-through;
+    }
+
+    .progress {
+      height: 7px;
+      border-radius: 99px;
+      background: #e9edf5;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .progress i {
+      display: block;
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6);
+      transition: width .3s ease;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- ================= 顶部导航 ================= -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <span class="brand"><i class="brand-dot"></i>实验5 · Vue.js</span>
+      <nav class="topnav">
+        <a href="index.html" class="active">首页</a>
+        <a href="01-basic.html">1 基础语法</a>
+        <a href="02-directives.html">2 常用指令</a>
+        <a href="03-blog.html">3 博客重构</a>
+        <a href="04-todolist.html">4 Todolist</a>
+        <a href="05-todolist-plus.html">5 增强版</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ================= 唯一的 Vue 实例根节点 ================= -->
+  <main id="app" class="wrap" v-cloak>
+
+    <section class="hero">
+      <span class="kicker">实验五 · 前端框架基础</span>
+      <h1>Vue.js 基本语法和常用指令</h1>
+      <p>
+        通过 <code style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">script</code>
+        标签直接引入 <code style="background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.3);color:#fff">vue.global.js</code>，
+        在不使用任何构建工具的前提下，完成选项式 API 语法、11 个常用指令、博客首页三步重构与 Todolist 经典案例。
+      </p>
+      <div class="meta">
+        <span>Vue 版本 <b>{{ vueVersion }}</b></span>
+        <span>演示页面 <b>{{ demos.length }}</b> 个</span>
+        <span>指令覆盖 <b>{{ directiveCount }}</b> 个</span>
+        <span>自检通过 <b>{{ doneCount }} / {{ checks.length }}</b></span>
+      </div>
+    </section>
+
+    <!-- ---------- 演示目录：v-for 渲染卡片 ---------- -->
+    <section class="card">
+      <div class="card-hd">
+        <h2>实验目录</h2>
+        <span class="tag tag-brand">v-for 渲染</span>
+        <span class="hint" style="margin-left:auto">共 {{ demos.length }} 个演示页，按实验步骤顺序排列</span>
+      </div>
+      <div class="card-bd">
+        <div class="grid">
+          <a class="demo-card" v-for="item in demos" :key="item.id" :href="item.href">
+            <div class="no">{{ item.no }}</div>
+            <h3>{{ item.title }}</h3>
+            <p>{{ item.desc }}</p>
+            <span class="go">{{ item.href }} →</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ---------- 指令覆盖表 ---------- -->
+    <section class="card">
+      <div class="card-hd">
+        <h2>指令覆盖对照表</h2>
+        <span class="tag">实验三.2(3) 要求</span>
+      </div>
+      <div class="card-bd">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>指令</th>
+              <th>作用</th>
+              <th>本实验中的落点</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="d in directives" :key="d.name">
+              <td><code>{{ d.name }}</code></td>
+              <td>{{ d.use }}</td>
+              <td class="muted">{{ d.where }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ---------- 验收自检 ---------- -->
+    <section class="card">
+      <div class="card-hd">
+        <h2>验收自检清单</h2>
+        <span class="tag" :class="doneCount === checks.length ? 'tag-ok' : 'tag-warn'">
+          {{ doneCount }} / {{ checks.length }}
+        </span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto" @click="resetChecks">重置</button>
+      </div>
+      <div class="card-bd">
+        <div class="progress"><i :style="{ width: percent + '%' }"></i></div>
+        <ul class="list-reset check-list" style="margin-top:10px">
+          <li v-for="c in checks" :key="c.id">
+            <input type="checkbox" v-model="c.done" :id="'ck-' + c.id">
+            <label :for="'ck-' + c.id" :class="['txt', { done: c.done }]">{{ c.text }}</label>
+          </li>
+        </ul>
+        <p class="hint" style="margin-top:12px">
+          勾选状态保存在内存中，刷新页面即复位 —— 这里只演示 <code>v-model</code> 绑定 checkbox 的布尔值，不涉及持久化。
+        </p>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>实验5 · Vue.js 基本语法和常用指令</span>
+      <span>Vue {{ vueVersion }} · 无构建工具 · 本地引入</span>
+    </footer>
+  </main>
+
+  <script src="vendor/vue.global.js"></script>
+  <script>
+    const { createApp } = Vue
+
+    createApp({
+      /* ---------- 状态 ---------- */
+      data() {
+        return {
+          vueVersion: Vue.version,
+          demos: [
+            { id: 1, no: 'STEP 1', href: '01-basic.html', title: '选项式 API 基础语法', desc: 'data / methods / computed / watch / mounted 五个选项各干一件事。' },
+            { id: 2, no: 'STEP 2', href: '02-directives.html', title: '常用指令全集', desc: 'v-text、v-html、v-if/else-if/else、v-show、v-for、v-bind、v-on、v-model 与修饰符。' },
+            { id: 3, no: 'STEP 3', href: '03-blog.html', title: '博客首页三步重构', desc: '文章列表 → 标题搜索 → 留言增删，全部改用指令与响应式数据驱动。' },
+            { id: 4, no: 'STEP 4', href: '04-todolist.html', title: '经典案例 Todolist', desc: '回车添加、点击删除、底部统计 —— 实验文档给出的最小闭环。' },
+            { id: 5, no: 'STEP 5', href: '05-todolist-plus.html', title: 'Todolist 增强版', desc: '完成状态、行内编辑与失焦保存、分类统计、筛选与本地持久化。' }
+          ],
+          directives: [
+            { name: 'v-text', use: '设置元素纯文本，会覆盖原有内容', where: '02 指令页 · 文本区' },
+            { name: 'v-html', use: '插入 HTML 片段（有 XSS 风险，仅信任内容）', where: '02 指令页 · 富文本区' },
+            { name: 'v-if / v-else-if / v-else', use: '条件渲染，条件为假时元素从 DOM 中移除', where: '02 指令页 · 条件区；04 空列表提示' },
+            { name: 'v-show', use: '切换 display，元素始终保留在 DOM 中', where: '02 指令页 · 显示切换对比' },
+            { name: 'v-for', use: '列表渲染，必须配合 :key', where: '全部页面 · 文章/留言/待办列表' },
+            { name: 'v-bind（:）', use: '绑定 HTML 属性 / class / style', where: '03 博客卡片 class、04 完成态样式' },
+            { name: 'v-on（@）', use: '事件监听，支持 .prevent / .stop / .once 等修饰符', where: '03 提交与删除、04 增删改' },
+            { name: 'v-model', use: '表单双向绑定，支持 .trim / .number / .lazy', where: '03 搜索框与留言框、04 任务输入' },
+            { name: 'v-cloak', use: '挂载完成前隐藏模板，避免闪烁', where: '每页根节点 <main id="app">' },
+            { name: 'v-once', use: '只渲染一次，跳过后续更新', where: '02 指令页 · 静态区' },
+            { name: 'v-pre', use: '跳过编译，原样输出 {{ }}', where: '02 指令页 · 语法示例' }
+          ],
+          checks: [
+            { id: 1, text: '页面通过本地 vendor/vue.global.js 引入 Vue，控制台输出 Vue 版本号', done: false },
+            { id: 2, text: '所有页面只创建一个 createApp 实例，根节点带 v-cloak 且不出现 {{ }} 闪烁', done: false },
+            { id: 3, text: 'v-for 渲染的每个元素都绑定唯一 :key，控制台无警告', done: false },
+            { id: 4, text: '博客文章列表由数据渲染，修改 articles 数组长度页面随之变化', done: false },
+            { id: 5, text: '标题搜索支持回车与点击两种触发，无结果时显示空状态提示', done: false },
+            { id: 6, text: '留言提交阻止表单默认行为，空内容与超长内容被拦截并提示', done: false },
+            { id: 7, text: '删除留言后列表与统计同步更新，不用手动操作 DOM', done: false },
+            { id: 8, text: 'Todolist 回车即可添加，输入为空时不产生空任务', done: false },
+            { id: 9, text: 'Todolist 完成状态可切换，已完成项显示删除线', done: false },
+            { id: 10, text: '双击任务进入编辑，失焦或回车保存，Esc 取消', done: false }
+          ]
+        }
+      },
+
+      /* ---------- 派生状态 ---------- */
+      computed: {
+        directiveCount() {
+          // 统计指令覆盖数量（v-if/else-if/else 算 1 条）
+          return this.directives.length
+        },
+        doneCount() {
+          return this.checks.filter(c => c.done).length
+        },
+        percent() {
+          return Math.round(this.doneCount / this.checks.length * 100)
+        }
+      },
+
+      /* ---------- 动作 ---------- */
+      methods: {
+        resetChecks() {
+          this.checks.forEach(c => { c.done = false })
+        }
+      },
+
+      /* ---------- 生命周期 ---------- */
+      mounted() {
+        console.log('[实验5] Vue 版本：', Vue.version)
+        console.log('[实验5] 首页已挂载，演示页数量：', this.demos.length)
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>

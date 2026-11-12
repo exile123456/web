@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4 Todolist 基础版 · 实验5</title>
+  <link rel="stylesheet" href="css/common.css">
+  <style>
+    .todo-shell {
+      max-width: 560px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .todo-hd {
+      padding: 18px 22px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, #eef2ff, #faf5ff);
+    }
+
+    .todo-hd h2 {
+      font-size: 17px;
+    }
+
+    .todo-hd p {
+      font-size: 12.5px;
+      color: var(--ink-3);
+      margin-top: 4px;
+    }
+
+    .todo-form {
+      display: flex;
+      gap: 9px;
+      padding: 16px 22px 6px;
+    }
+
+    .todo-form .input {
+      flex: 1;
+    }
+
+    .todo-list {
+      padding: 8px 22px 4px;
+      margin: 0;
+      list-style: none;
+    }
+
+    .todo-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px dashed #e8ecf3;
+      font-size: 14px;
+    }
+
+    .todo-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .todo-list .idx {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 6px;
+      background: #f1f5f9;
+      color: var(--ink-3);
+      font: 700 11.5px/22px var(--mono);
+      text-align: center;
+    }
+
+    .todo-list .text {
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+      cursor: pointer;
+    }
+
+    .todo-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 22px 16px;
+      border-top: 1px solid var(--line);
+      background: #fcfcfe;
+      font-size: 12.5px;
+      color: var(--ink-3);
+      flex-wrap: wrap;
+    }
+
+    .todo-foot b {
+      color: var(--brand-dark);
+      font-family: var(--mono);
+      font-size: 14px;
+    }
+
+    .todo-empty {
+      padding: 26px 22px;
+      text-align: center;
+      color: var(--ink-4);
+      font-size: 13.5px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <span class="brand"><i class="brand-dot"></i>实验5 · Vue.js</span>
+      <nav class="topnav">
+        <a href="index.html">首页</a>
+        <a href="01-basic.html">1 基础语法</a>
+        <a href="02-directives.html">2 常用指令</a>
+        <a href="03-blog.html">3 博客重构</a>
+        <a href="04-todolist.html" class="active">4 Todolist</a>
+        <a href="05-todolist-plus.html">5 增强版</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app" class="wrap" v-cloak>
+
+    <div class="page-head">
+      <span class="eyebrow">【范例】经典案例：代办事项 Todolist</span>
+      <h1>阶段一：能加、能删、能统计</h1>
+      <p class="sub">
+        实验文档给出的最小版本：输入框回车添加、点击按钮删除、底部显示统计。
+        它把 <code>v-for</code>、<code>v-model</code>、<code>v-on</code>、<code>v-if</code>
+        四个指令串成了一个完整闭环，是理解"数据驱动视图"最省事的例子。
+      </p>
+    </div>
+
+    <div class="note" style="margin-bottom:18px">
+      这里刻意<strong>去掉了"添加"按钮</strong>：input 在 form 里回车会触发表单 submit，
+      属于浏览器原生行为，用 <code>@submit.prevent</code> 接住即可，少一个控件、少一次点击。
+    </div>
+
+    <!-- ============ Todolist ============ -->
+    <section class="todo-shell">
+      <div class="todo-hd">
+        <h2>待办任务列表</h2>
+        <p>输入任务内容，按回车添加</p>
+      </div>
+
+      <!-- 表单：回车提交 -->
+      <form class="todo-form" @submit.prevent="add">
+        <input class="input" type="text" v-model.trim="taskText" placeholder="例如：复习 v-for 的 :key 用法"
+          maxlength="60" ref="taskInput">
+        <button type="submit" class="btn">添加</button>
+      </form>
+
+      <!-- 列表：v-for + v-on -->
+      <ul class="todo-list" v-if="todos.length">
+        <li v-for="(todo, index) in todos" :key="todo.id">
+          <span class="idx">{{ index + 1 }}</span>
+          <span class="text" @click="toggle(todo)" :title="'点击切换完成状态'">{{ todo.text }}</span>
+          <button type="button" class="btn btn-danger btn-sm" @click="del(index)">删除</button>
+        </li>
+      </ul>
+
+      <!-- 空状态：v-if / v-else -->
+      <div class="todo-empty" v-else>
+        还没有任务，先在上面的输入框里敲一条吧
+      </div>
+
+      <!-- 统计：v-if 控制右下角标签 -->
+      <div class="todo-foot">
+        <span>共 <b>{{ todos.length }}</b> 项任务</span>
+        <span class="tag tag-ok" v-if="todos.length && todos.every(t => t.done)">全部完成 🎉</span>
+        <span class="tag tag-warn" v-else-if="todos.length">还有 {{ todos.filter(t => !t.done).length }} 项未完成</span>
+      </div>
+    </section>
+
+    <!-- ============ 拆解 ============ -->
+    <section class="card" style="margin-top:22px">
+      <div class="card-hd">
+        <h2>四个指令如何串起来</h2>
+        <span class="tag">本页 data / methods 对照</span>
+      </div>
+      <div class="card-bd">
+        <table style="width:100%;border-collapse:collapse;font-size:13.5px">
+          <thead>
+            <tr style="background:#f8fafc">
+              <th style="text-align:left;padding:9px 10px;border-bottom:1px solid var(--line);width:150px">指令 / 选项</th>
+              <th style="text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)">在本例中的职责</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)"><code>v-model</code></td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)">把输入框内容同步到 <code>taskText</code>，反向也可能（清空时输入框自动变空）</td>
+            </tr>
+            <tr>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)"><code>@submit.prevent</code></td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)">拦住表单默认的"提交并刷新页面"，改调 <code>add()</code></td>
+            </tr>
+            <tr>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)"><code>v-for</code> + <code>:key</code></td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)">按数组长度生成 li；key 用稳定的 <code>todo.id</code>，删除时不会错位</td>
+            </tr>
+            <tr>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)"><code>@click</code></td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)">删除时传下标 <code>index</code>，由 <code>del()</code> 用 <code>splice</code> 移除</td>
+            </tr>
+            <tr>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)"><code>v-if / v-else</code></td>
+              <td style="padding:9px 10px;border-bottom:1px solid var(--line)">列表为空时显示空状态；全部完成时显示"🎉"标签</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <details class="code-fold" style="margin-top:16px">
+          <summary>展开查看本页完整逻辑（与实验文档结构一致）</summary>
+          <pre class="code" v-pre><code>&lt;div id="app"&gt;
+  &lt;form @submit.prevent="add"&gt;
+    &lt;input v-model.trim="taskText" placeholder="输入任务内容，按回车添加"&gt;
+  &lt;/form&gt;
+
+  &lt;ul v-if="todos.length"&gt;
+    &lt;li v-for="(todo, index) in todos" :key="todo.id"&gt;
+      &lt;span @click="toggle(todo)"&gt;{{ todo.text }}&lt;/span&gt;
+      &lt;button @click="del(index)"&gt;删除&lt;/button&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+  &lt;div v-else&gt;还没有任务…&lt;/div&gt;
+
+  &lt;p&gt;共 {{ todos.length }} 项任务&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+const { createApp } = Vue
+createApp({
+  data() {
+    return {
+      todos: [],        // 待办任务列表数据
+      taskText: ''      // input 输入框双向绑定的内容
+    }
+  },
+  methods: {
+    add() {
+      const text = this.taskText.trim()
+      if (!text) return                       // 输入内容为空则不入库
+      this.todos.push({ id: Date.now(), text, done: false })
+      this.taskText = ''                      // 清空输入框
+    },
+    del(index) {
+      this.todos.splice(index, 1)             // 从数组中删除所点击的 li
+    },
+    toggle(todo) {
+      todo.done = !todo.done                  // 基础版先留一个钩子，增强版会用到
+    }
+  }
+}).mount('#app')
+&lt;/script&gt;</code></pre>
+        </details>
+
+        <p class="hint" style="margin-top:14px">
+          下一阶段在 <a href="05-todolist-plus.html">05 增强版</a> 里补齐实验要求的四项新增功能：
+          完成状态、行内编辑、失焦保存、分类统计。
+        </p>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>实验5 · 4 Todolist（基础版）</span>
+      <span>Vue {{ vueVersion }}</span>
+    </footer>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="vendor/vue.global.js"></script>
+  <script>
+    const { createApp } = Vue
+
+    createApp({
+      data() {
+        return {
+          vueVersion: Vue.version,
+          todos: window.BLOG_DATA.todos.map(t => ({ ...t })),
+          taskText: ''
+        }
+      },
+
+      methods: {
+        add() {
+          const text = this.taskText.trim()
+          if (!text) {
+            // 空内容给一点反馈：聚焦回输入框
+            this.$refs.taskInput && this.$refs.taskInput.focus()
+            return
+          }
+          this.todos.push({ id: Date.now(), text, done: false })
+          this.taskText = ''
+          this.$nextTick(() => this.$refs.taskInput && this.$refs.taskInput.focus())
+        },
+        del(index) {
+          console.log('[实验5] 删除下标：', index, '内容：', this.todos[index] && this.todos[index].text)
+          this.todos.splice(index, 1)
+        },
+        toggle(todo) {
+          todo.done = !todo.done
+        }
+      },
+
+      mounted() {
+        this.$refs.taskInput && this.$refs.taskInput.focus()
+        console.log('[实验5] Todolist 基础版已挂载，初始任务数：', this.todos.length)
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>

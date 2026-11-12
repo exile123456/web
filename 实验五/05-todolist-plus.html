@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>5 Todolist 增强版 · 实验5</title>
+  <link rel="stylesheet" href="css/common.css">
+  <style>
+    .todo-shell {
+      max-width: 620px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--r-lg);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .todo-hd {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--line);
+      background: linear-gradient(135deg, #eef2ff, #fdf4ff);
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .todo-hd h2 {
+      font-size: 17px;
+    }
+
+    .todo-hd p {
+      font-size: 12.5px;
+      color: var(--ink-3);
+      margin-top: 3px;
+      width: 100%;
+    }
+
+    .todo-form {
+      display: flex;
+      gap: 9px;
+      padding: 16px 22px 10px;
+    }
+
+    .todo-form .input {
+      flex: 1;
+    }
+
+    /* 进度条 */
+    .progress-wrap {
+      padding: 0 22px 14px;
+    }
+
+    .progress-bar {
+      height: 8px;
+      border-radius: 99px;
+      background: #eef2f7;
+      overflow: hidden;
+    }
+
+    .progress-bar i {
+      display: block;
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #6366f1, #22c55e);
+      transition: width .35s cubic-bezier(.4, 0, .2, 1);
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--ink-3);
+      margin-top: 7px;
+      font-family: var(--mono);
+    }
+
+    /* 工具栏 */
+    .todo-tools {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 22px 12px;
+      flex-wrap: wrap;
+    }
+
+    .todo-tools .spacer {
+      flex: 1;
+    }
+
+    /* 列表 */
+    .todo-list {
+      padding: 0 22px;
+      margin: 0;
+      list-style: none;
+      border-top: 1px solid var(--line);
+    }
+
+    .todo-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px dashed #e8ecf3;
+      font-size: 14px;
+      transition: background .16s;
+    }
+
+    .todo-list li.editing {
+      background: #f8faff;
+      margin: 0 -22px;
+      padding: 12px 22px;
+    }
+
+    .todo-list li:last-child {
+      border-bottom: 0;
+    }
+
+    .todo-list input[type="checkbox"] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--brand);
+      flex: none;
+      cursor: pointer;
+    }
+
+    .todo-list .text {
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+      cursor: text;
+      line-height: 1.5;
+    }
+
+    .todo-list .text.done {
+      text-decoration: line-through;
+      color: var(--ink-4);
+    }
+
+    .todo-list .edit-input {
+      flex: 1;
+      min-width: 0;
+      padding: 5px 9px;
+      border: 1px solid var(--brand);
+      border-radius: 5px;
+      font: inherit;
+      font-size: 14px;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, .14);
+    }
+
+    .todo-list .ops {
+      display: flex;
+      gap: 6px;
+      flex: none;
+    }
+
+    .todo-empty {
+      padding: 30px 22px;
+      text-align: center;
+      color: var(--ink-4);
+      font-size: 13.5px;
+      border-top: 1px solid var(--line);
+    }
+
+    .todo-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 13px 22px;
+      border-top: 1px solid var(--line);
+      background: #fcfcfe;
+      font-size: 12.5px;
+      color: var(--ink-3);
+      flex-wrap: wrap;
+    }
+
+    .stat-group {
+      display: flex;
+      gap: 14px;
+    }
+
+    .stat-group span {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+
+    .stat-group b {
+      font-family: var(--mono);
+      font-size: 14px;
+      color: var(--ink);
+    }
+
+    .stat-group .c-done b {
+      color: var(--ok);
+    }
+
+    .stat-group .c-active b {
+      color: var(--warn);
+    }
+
+    /* 功能对照 */
+    .feat-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .feat {
+      display: flex;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      background: #fcfcfe;
+    }
+
+    .feat .no {
+      flex: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--brand-soft);
+      border: 1px solid var(--brand-line);
+      color: var(--brand-dark);
+      font: 700 11.5px/22px var(--mono);
+      text-align: center;
+    }
+
+    .feat h4 {
+      font-size: 13.5px;
+      margin-bottom: 3px;
+    }
+
+    .feat p {
+      font-size: 12.5px;
+      color: var(--ink-3);
+      line-height: 1.65;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <span class="brand"><i class="brand-dot"></i>实验5 · Vue.js</span>
+      <nav class="topnav">
+        <a href="index.html">首页</a>
+        <a href="01-basic.html">1 基础语法</a>
+        <a href="02-directives.html">2 常用指令</a>
+        <a href="03-blog.html">3 博客重构</a>
+        <a href="04-todolist.html">4 Todolist</a>
+        <a href="05-todolist-plus.html" class="active">5 增强版</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="app" class="wrap" v-cloak>
+
+    <div class="page-head">
+      <span class="eyebrow">实验要求 · Todolist 新增功能 1—4</span>
+      <h1>阶段二：完成状态 / 行内编辑 / 分类统计</h1>
+      <p class="sub">
+        在基础版之上补齐四项功能：① 完成状态切换与删除线；② 编辑按钮 → 输入框；
+        ③ 失焦或回车保存、Esc 取消；④ 未完成/已完成分类统计。
+        额外加了筛选、全选、清除已完成与 <code>localStorage</code> 持久化。
+      </p>
+    </div>
+
+    <!-- ============ 增强版 Todolist ============ -->
+    <section class="todo-shell">
+      <div class="todo-hd">
+        <h2>待办任务列表</h2>
+        <span class="tag tag-brand">v-model · v-for · v-if · v-on</span>
+        <p>输入任务内容，按回车添加；勾选复选框切换完成状态；双击文字即可行内编辑</p>
+      </div>
+
+      <form class="todo-form" @submit.prevent="add">
+        <input class="input" type="text" v-model.trim="taskText" ref="taskInput" maxlength="60"
+          placeholder="例如：把 Todolist 加上编辑功能">
+        <button type="submit" class="btn">添加</button>
+      </form>
+
+      <!-- 进度 -->
+      <div class="progress-wrap">
+        <div class="progress-bar"><i :style="{ width: percent + '%' }"></i></div>
+        <div class="progress-meta">
+          <span>完成度 {{ percent }}%</span>
+          <span>{{ stats.done }} / {{ stats.total }}</span>
+        </div>
+      </div>
+
+      <!-- 工具栏 -->
+      <div class="todo-tools">
+        <div class="segmented">
+          <button v-for="f in filters" :key="f.value" :class="{ on: mode === f.value }"
+            @click="mode = f.value">{{ f.label }} {{ countOf(f.value) }}</button>
+        </div>
+        <span class="spacer"></span>
+        <button class="btn btn-ghost btn-sm" @click="toggleAll" v-if="stats.total">
+          {{ allDone ? '取消全选' : '全部完成' }}
+        </button>
+        <button class="btn btn-ghost btn-sm" @click="clearDone" v-if="stats.done">清除已完成</button>
+      </div>
+
+      <!-- 列表 -->
+      <ul class="todo-list" v-if="visibleTodos.length">
+        <li v-for="todo in visibleTodos" :key="todo.id" :class="{ editing: editingId === todo.id }">
+
+          <input type="checkbox" v-model="todo.done" :title="todo.done ? '标记为未完成' : '标记为已完成'">
+
+          <!-- 编辑态：input 替换 p -->
+          <input v-if="editingId === todo.id" class="edit-input" type="text" v-model="editingText" maxlength="60"
+            @blur="saveEdit(todo)" @keyup.enter="saveEdit(todo)" @keyup.esc="cancelEdit">
+
+          <!-- 展示态：p 标签 -->
+          <span v-else class="text" :class="{ done: todo.done }" @dblclick="startEdit(todo)" :title="'双击可编辑'">
+            {{ todo.text }}
+          </span>
+
+          <div class="ops">
+            <button v-if="editingId !== todo.id" class="btn btn-soft btn-sm" @click="startEdit(todo)">编辑</button>
+            <button v-else class="btn btn-sm" @click="saveEdit(todo)">保存</button>
+            <button class="btn btn-danger btn-sm" @click="del(todo.id)">删除</button>
+          </div>
+        </li>
+      </ul>
+
+      <div class="todo-empty" v-else>
+        <template v-if="stats.total === 0">还没有任务，先在上面的输入框里敲一条吧</template>
+        <template v-else-if="mode === 'active'">没有未完成的任务，全部搞定了 🎉</template>
+        <template v-else-if="mode === 'done'">还没有已完成的任务，去勾掉几个吧</template>
+        <template v-else>当前筛选下没有任务</template>
+      </div>
+
+      <!-- 分类统计 -->
+      <div class="todo-foot">
+        <div class="stat-group">
+          <span>共 <b>{{ stats.total }}</b> 项</span>
+          <span class="c-active">未完成 <b>{{ stats.active }}</b></span>
+          <span class="c-done">已完成 <b>{{ stats.done }}</b></span>
+        </div>
+        <span class="tag tag-ok" v-if="stats.total && stats.active === 0">全部完成 🎉</span>
+        <span class="tag" v-else-if="stats.total">还剩 {{ stats.active }} 项</span>
+      </div>
+    </section>
+
+    <p class="hint" style="text-align:center;margin-top:12px">
+      数据保存在浏览器 <code>localStorage</code>（键名 <code>lab5-todos</code>），刷新页面不会丢失。
+      <button class="btn btn-ghost btn-sm" @click="resetAll">恢复初始数据</button>
+    </p>
+
+    <!-- ============ 功能拆解 ============ -->
+    <section class="card" style="margin-top:24px">
+      <div class="card-hd">
+        <h2>四项新增功能的实现要点</h2>
+        <span class="tag tag-brand">对照实验要求</span>
+      </div>
+      <div class="card-bd">
+        <div class="feat-list">
+          <div class="feat">
+            <span class="no">1</span>
+            <div>
+              <h4>完成状态</h4>
+              <p>
+                <code>&lt;input type="checkbox" v-model="todo.done"&gt;</code>：v-model 直接绑定到对象属性上，
+                勾选即改数据；文字用 <code>:class="{ done: todo.done }"</code> 加删除线。
+                因为是同一个对象引用，改属性不需要替换数组，视图也会更新（响应式深层代理）。
+              </p>
+            </div>
+          </div>
+
+          <div class="feat">
+            <span class="no">2</span>
+            <div>
+              <h4>点击"编辑" → p 变成 input</h4>
+              <p>
+                用一个 <code>editingId</code> 记录"当前正在编辑哪一条"，配合 <code>v-if / v-else</code>
+                在 <code>&lt;span&gt;</code> 与 <code>&lt;input&gt;</code> 之间切换；
+                <code>v-model="editingText"</code> 时不要直接绑 <code>todo.text</code>，否则取消编辑无法还原。
+              </p>
+            </div>
+          </div>
+
+          <div class="feat">
+            <span class="no">3</span>
+            <div>
+              <h4>失焦 / 回车保存，Esc 取消</h4>
+              <p>
+                <code>@blur="saveEdit(todo)"</code> 与 <code>@keyup.enter="saveEdit(todo)"</code> 共用一个保存方法；
+                保存时先 <code>trim()</code>，空内容视为放弃修改。
+                <code>@keyup.esc="cancelEdit"</code> 把 <code>editingId</code> 置空。
+                注意：回车保存后输入框被销毁也会触发 blur，所以保存方法要<strong>幂等</strong>。
+              </p>
+            </div>
+          </div>
+
+          <div class="feat">
+            <span class="no">4</span>
+            <div>
+              <h4>分类统计</h4>
+              <p>
+                用 <code>computed</code> 从同一份 <code>todos</code> 派生出 <code>{ total, active, done }</code>，
+                不额外维护计数器，避免"删了任务但统计没减"的经典 bug。
+                顶部进度条 = <code>done / total</code>，用 <code>:style="{ width: percent + '%' }"</code> 驱动。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <details class="code-fold" style="margin-top:16px">
+          <summary>展开查看增强版核心代码</summary>
+          <pre class="code" v-pre><code>data() {
+  return {
+    todos: [],                 // { id, text, done }
+    taskText: '',
+    mode: 'all',               // all | active | done
+    editingId: null,           // 正在编辑的任务 id
+    editingText: ''            // 编辑时的临时副本
+  }
+},
+
+computed: {
+  // 分类统计：全部由 todos 派生，不存冗余状态
+  stats() {
+    const total = this.todos.length
+    const done = this.todos.filter(t =&gt; t.done).length
+    return { total, done, active: total - done }
+  },
+  percent() {
+    return this.stats.total ? Math.round(this.stats.done / this.stats.total * 100) : 0
+  },
+  // 筛选后的可见列表（模板里 v-for 用它）
+  visibleTodos() {
+    if (this.mode === 'active') return this.todos.filter(t =&gt; !t.done)
+    if (this.mode === 'done') return this.todos.filter(t =&gt; t.done)
+    return this.todos
+  },
+  allDone() {
+    return this.stats.total &gt; 0 &amp;&amp; this.stats.active === 0
+  }
+},
+
+methods: {
+  add() {
+    const text = this.taskText.trim()
+    if (!text) { this.$refs.taskInput.focus(); return }
+    this.todos.push({ id: Date.now(), text, done: false })
+    this.taskText = ''
+  },
+  del(id) {
+    this.todos = this.todos.filter(t =&gt; t.id !== id)
+  },
+  startEdit(todo) {
+    this.editingId = todo.id
+    this.editingText = todo.text
+    // DOM 更新后再聚焦，否则 input 还不存在
+    this.$nextTick(() =&gt; {
+      const el = this.$el.querySelector('.edit-input')
+      el &amp;&amp; el.focus()
+    })
+  },
+  saveEdit(todo) {
+    if (this.editingId !== todo.id) return      // 幂等：避免 blur 与 enter 重复执行
+    const text = this.editingText.trim()
+    if (text) todo.text = text                  // 空内容 = 放弃修改
+    this.editingId = null
+    this.editingText = ''
+  },
+  cancelEdit() {
+    this.editingId = null
+    this.editingText = ''
+  }
+},
+
+watch: {
+  // 任何改动都落盘，deep 才能监听到 todo.done 这种深层属性
+  todos: {
+    handler(list) { localStorage.setItem('lab5-todos', JSON.stringify(list)) },
+    deep: true
+  }
+},
+
+mounted() {
+  const saved = localStorage.getItem('lab5-todos')
+  if (saved) {
+    try { this.todos = JSON.parse(saved) } catch (e) { console.warn('本地数据损坏', e) }
+  }
+}</code></pre>
+        </details>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <span>实验5 · 5 Todolist（增强版）</span>
+      <span>Vue {{ vueVersion }} · localStorage 持久化</span>
+    </footer>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="vendor/vue.global.js"></script>
+  <script>
+    const { createApp } = Vue
+    const STORAGE_KEY = 'lab5-todos'
+
+    createApp({
+      data() {
+        return {
+          vueVersion: Vue.version,
+          todos: [],
+          taskText: '',
+          mode: 'all',
+          editingId: null,
+          editingText: '',
+          filters: [
+            { value: 'all', label: '全部' },
+            { value: 'active', label: '未完成' },
+            { value: 'done', label: '已完成' }
+          ]
+        }
+      },
+
+      computed: {
+        stats() {
+          const total = this.todos.length
+          const done = this.todos.filter(t => t.done).length
+          return { total, done, active: total - done }
+        },
+        percent() {
+          return this.stats.total ? Math.round(this.stats.done / this.stats.total * 100) : 0
+        },
+        visibleTodos() {
+          if (this.mode === 'active') return this.todos.filter(t => !t.done)
+          if (this.mode === 'done') return this.todos.filter(t => t.done)
+          return this.todos
+        },
+        allDone() {
+          return this.stats.total > 0 && this.stats.active === 0
+        }
+      },
+
+      methods: {
+        countOf(mode) {
+          if (mode === 'active') return this.stats.active
+          if (mode === 'done') return this.stats.done
+          return this.stats.total
+        },
+        add() {
+          const text = this.taskText.trim()
+          if (!text) {
+            this.$refs.taskInput && this.$refs.taskInput.focus()
+            return
+          }
+          this.todos.unshift({ id: Date.now(), text, done: false })
+          this.taskText = ''
+          // 如果当前在"已完成"筛选下，新任务不可见，自动切回全部，避免用户以为添加失败
+          if (this.mode === 'done') this.mode = 'all'
+          this.$nextTick(() => this.$refs.taskInput && this.$refs.taskInput.focus())
+        },
+        del(id) {
+          this.todos = this.todos.filter(t => t.id !== id)
+        },
+        toggle(todo) {
+          todo.done = !todo.done
+        },
+        toggleAll() {
+          const next = !this.allDone
+          this.todos.forEach(t => { t.done = next })
+        },
+        clearDone() {
+          this.todos = this.todos.filter(t => !t.done)
+        },
+        startEdit(todo) {
+          if (this.editingId !== null && this.editingId !== todo.id) {
+            // 切换编辑对象前先落盘上一条，避免改动丢失
+            const prev = this.todos.find(t => t.id === this.editingId)
+            if (prev) {
+              const t = this.editingText.trim()
+              if (t) prev.text = t
+            }
+          }
+          this.editingId = todo.id
+          this.editingText = todo.text
+          this.$nextTick(() => {
+            const el = this.$el.querySelector('.edit-input')
+            if (el) {
+              el.focus()
+              el.select()
+            }
+          })
+        },
+        saveEdit(todo) {
+          // 幂等：回车保存后 input 销毁会再触发一次 blur，这里直接忽略第二次
+          if (this.editingId !== todo.id) return
+          const text = this.editingText.trim()
+          if (text) todo.text = text
+          this.editingId = null
+          this.editingText = ''
+        },
+        cancelEdit() {
+          this.editingId = null
+          this.editingText = ''
+        },
+        resetAll() {
+          this.todos = window.BLOG_DATA.todos.map(t => ({ ...t }))
+          this.mode = 'all'
+          this.editingId = null
+          localStorage.removeItem(STORAGE_KEY)
+        }
+      },
+
+      watch: {
+        todos: {
+          handler(list) {
+            try {
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+            } catch (e) {
+              console.warn('[实验5] 本地存储写入失败', e)
+            }
+          },
+          deep: true
+        }
+      },
+
+      mounted() {
+        const saved = localStorage.getItem(STORAGE_KEY)
+        if (saved) {
+          try {
+            const list = JSON.parse(saved)
+            if (Array.isArray(list)) this.todos = list
+          } catch (e) {
+            console.warn('[实验5] 本地数据解析失败，已回退到初始数据', e)
+            this.todos = window.BLOG_DATA.todos.map(t => ({ ...t }))
+          }
+        } else {
+          this.todos = window.BLOG_DATA.todos.map(t => ({ ...t }))
+        }
+        console.log('[实验5] Todolist 增强版已挂载，任务数：', this.todos.length)
+      }
+    }).mount('#app')
+  </script>
+</body>
+
+</html>
